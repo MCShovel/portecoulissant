@@ -1,0 +1,46 @@
+Version 1.4.1 - released 22-12-2012
+
+* Support versions 1.4.5 and later of Bukkit, which had a breaking change in its
+  API (specifically, the mapping of cardinal directions to coordinate axes was
+  rotated).
+
+Version 1.4 - released 15-12-2012
+
+* The plugin now supports sound effects! If the SpoutPlugin plugin is installed
+  on the server, and the user logs in with Spoutcraft, sound effects will be
+  played whenever a portcullis is hoisted or dropped. For details about
+  SpoutPlugin and Spoutcraft, see http://www.spout.org/.
+
+  *Note:* the default sound effects are tuned for the default hoisting and
+  dropping speeds. For this reason the sound effects are turned off by default
+  if you have customised the hoisting or dropping speed. You can force the sound
+  effects to be enabled by adding the line "soundEffects: true" to the
+  config.yml file. You will probably also want to provide your own customised
+  sound effects in this case. See
+  http://dev.bukkit.org/server-mods/portecoulissante/pages/configuration/ for
+  details.
+* Support for new Minecraft 1.4 block types has been added.
+* Java 5 is no longer supported.
+
+Version 1.3 - released 5-8-2012
+
+* A default config.yml file is now always created whenever the plugin is loaded
+  and there isn't one yet, to cut down on confusion and draw attention to the
+  configuration possibilities.
+* Added new option to restrict power blocks (the frame blocks through which the
+  redstone power is delivered to the portcullis) to certain types of block. This
+  achieves a few goals:
+  - Make it more difficult to build portculisses by having to use scarce
+    resources in building them.
+  - Make it easier to use a common material for the portcullis itself, since the
+    chance of bits of wall flying off accidentally because there is redstone
+    nearby is smaller if the power block has to be a rare block.
+  - Slightly improve the performance of the plugin.
+* Added new option to disallow "floating" portcullises, stopping people from
+  sending portcullises off into the blue sky either by accident (because they
+  forgot to build a lintel above it) or on purpose.
+
+Version 1.2.9 - released 20-5-2012
+
+* Support new solid blocks for frame (end stone, etc.)
+* Ignore redstone current through sign posts and wall signs (this may or may not be a Bukkit bug)
