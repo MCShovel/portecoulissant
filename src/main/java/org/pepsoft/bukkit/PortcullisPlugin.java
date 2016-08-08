@@ -15,16 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.pepsoft.bukkit.portcullis;
+package org.pepsoft.bukkit;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -34,24 +31,29 @@ import java.util.logging.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.getspout.spoutapi.SpoutManager;
-import static org.pepsoft.minecraft.Constants.*;
+import org.pepsoft.bukkit.portcullis.PortcullisBlockListener;
+import org.pepsoft.bukkit.retractablebridge.BridgeBlockListener;
 
 /**
  *
  * @author pepijn
  */
 public class PortcullisPlugin extends JavaPlugin {
+
+	public PortcullisPlugin () {
+	}
+
     @Override
     public void onDisable() {
-        if (logger.isLoggable(Level.FINE)) {
+		if (logger.isLoggable(Level.FINE)) {
             logger.fine("[PorteCoulissante] Plugin disabled");
         }
     }
 
     @Override
     public void onEnable() {
-        if (logger.isLoggable(Level.FINEST)) {
+
+		if (logger.isLoggable(Level.FINEST)) {
             logger.log(Level.FINEST, "[PorteCoulissante] PortcullisPlugin.onEnable() (thread: " + Thread.currentThread() + ")", new Throwable());
         }
         
@@ -81,18 +83,17 @@ public class PortcullisPlugin extends JavaPlugin {
         
         FileConfiguration config = getConfig();
         entityMovingEnabled = config.getBoolean("entityMoving");
-        hoistingDelay = config.getInt("hoistingDelay");
+        movingDelayBase = config.getInt("movingDelayBase", DEFAULT_MOVING_DELAY_BASE);
+        maximumBoosts = config.getInt("maximumBoosts", DEFAULT_MAXIMUM_BOOSTS);
+        bridgeMaterials = Collections.unmodifiableSet(new HashSet<Integer>(config.getIntegerList("bridgeMaterials")));
+    	hoistingDelay = config.getInt("hoistingDelay");
         droppingDelay = config.getInt("droppingDelay");
         portcullisMaterials = Collections.unmodifiableSet(new HashSet<Integer>(config.getIntegerList("portcullisMaterials")));
         allowFloating = config.getBoolean("allowFloating");
         powerBlocks = Collections.unmodifiableSet(new HashSet<Integer>(config.getIntegerList("powerBlocks")));
         additionalWallMaterials = Collections.unmodifiableSet(new HashSet<Integer>(config.getIntegerList("additionalWallMaterials")));
-        startSoundURL = config.getString("startSoundURL");
-        upSoundURL = config.getString("upSoundURL");
-        downSoundURL = config.getString("downSoundURL");
-        soundEffectDistance = config.getInt("soundEffectDistance");
-        soundEffectVolume = config.getInt("soundEffectVolume");
         allPowerBlocksAllowed = powerBlocks.isEmpty();
+        
         boolean defaultSpeeds = true;
         List<String> warnings = new ArrayList<String>();
         if (hoistingDelay != DEFAULT_HOISTING_DELAY) {
@@ -104,9 +105,6 @@ public class PortcullisPlugin extends JavaPlugin {
             defaultSpeeds = false;
         }
         soundEffects = config.getBoolean("soundEffects", defaultSpeeds);
-        if (! portcullisMaterials.equals(DEFAULT_PORTCULLIS_MATERIALS)) {
-            warnings.add("portcullis materials " + portcullisMaterials);
-        }
         if (allowFloating != DEFAULT_ALLOW_FLOATING) {
             warnings.add("floating not allowed");
         }
@@ -142,45 +140,14 @@ public class PortcullisPlugin extends JavaPlugin {
         }
         
         if (soundEffects) {
-            // Check the validity of the URLs
-            boolean urlsValid = true;
-            try {
-                new URL(upSoundURL);
-            } catch (MalformedURLException e) {
-                logger.severe("[PorteCoulissante] upSoundURL parameter is missing or invalid; disabling sound effects");
-                urlsValid = false;
-            }
-            try {
-                new URL(startSoundURL);
-            } catch (MalformedURLException e) {
-                logger.severe("[PorteCoulissante] startSoundURL parameter is missing or invalid; disabling sound effects");
-                urlsValid = false;
-            }
-            try {
-                new URL(downSoundURL);
-            } catch (MalformedURLException e) {
-                logger.severe("[PorteCoulissante] downSoundURL parameter is missing or invalid; disabling sound effects");
-                urlsValid = false;
-            }
-            if (urlsValid) {
-                try {
-                    // Check whether the SpoutPlugin is available
-                    SpoutManager.getSoundManager();
-                    logger.info("[PorteCoulissante] Sound effects enabled");
-                } catch (NoClassDefFoundError e) {
-                    logger.info("[PorteCoulissante] SpoutPlugin not available; disabling sound effects");
-                    soundEffects = false;
-                }
-            } else {
-                soundEffects = false;
-            }
-        } else {
-            logger.info("[PorteCoulissante] Sound effects disabled");
+			soundEffects = false;
         }
 
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PortcullisBlockListener(this), this);
         logger.info("[PorteCoulissante] Plugin version " + getDescription().getVersion() + " by Captain_Chaos enabled");
+        pluginManager.registerEvents(new BridgeBlockListener(this), this);
+        logger.info("[RetractableBridge] plugin version " + getDescription().getVersion() + " by Captain_Chaos enabled");
     }
 
     public boolean isEntityMovingEnabled() {
@@ -210,45 +177,35 @@ public class PortcullisPlugin extends JavaPlugin {
     public boolean isAllPowerBlocksAllowed() {
         return allPowerBlocksAllowed;
     }
-
-    public boolean isSoundEffects() {
-        return soundEffects;
+    
+    public int getMovingDelayBase() {
+        return movingDelayBase;
     }
 
-    public String getStartSoundURL() {
-        return startSoundURL;
-    }
-
-    public String getUpSoundURL() {
-        return upSoundURL;
-    }
-
-    public String getDownSoundURL() {
-        return downSoundURL;
-    }
-
-    public int getSoundEffectDistance() {
-        return soundEffectDistance;
-    }
-
-    public int getSoundEffectVolume() {
-        return soundEffectVolume;
+    public Set<Integer> getBridgeMaterials() {
+        return bridgeMaterials;
     }
 
     public Set<Integer> getAdditionalWallMaterials() {
         return additionalWallMaterials;
     }
 
-    private boolean entityMovingEnabled, soundEffects;
-    private int hoistingDelay, droppingDelay, soundEffectDistance, soundEffectVolume;
-    private Set<Integer> portcullisMaterials, powerBlocks, additionalWallMaterials;
-    private boolean allowFloating, allPowerBlocksAllowed;
-    private String startSoundURL, upSoundURL, downSoundURL;
+    public int getMaximumBoosts() {
+        return maximumBoosts;
+    }
 
-    static final Logger logger = Logger.getLogger("Minecraft.org.pepsoft.bukkit.portcullis");
+    private boolean entityMovingEnabled, soundEffects;
+    private int movingDelayBase, maximumBoosts;
+    private int hoistingDelay, droppingDelay;
+    private Set<Integer> portcullisMaterials;
+    private Set<Integer> bridgeMaterials;
+    private Set<Integer> powerBlocks, additionalWallMaterials;
+    private boolean allowFloating, allPowerBlocksAllowed;
+
+    public static final Logger logger = Logger.getLogger("Minecraft.org.pepsoft.bukkit.portcullis");
     
     private static final int DEFAULT_HOISTING_DELAY = 40, DEFAULT_DROPPING_DELAY = 10;
-    private static final Set<Integer> DEFAULT_PORTCULLIS_MATERIALS = new HashSet<Integer>(Arrays.asList(BLK_FENCE, BLK_IRON_BARS, BLK_NETHER_BRICK_FENCE));
+    private static final int DEFAULT_MOVING_DELAY_BASE = 30, DEFAULT_MAXIMUM_BOOSTS = 2;
     private static final boolean DEFAULT_ALLOW_FLOATING = true;
     private static final int BUFFER_SIZE = 32768;
 }

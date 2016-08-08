@@ -1,12 +1,19 @@
+
 entityMoving: true
+
+movingDelayBase: 30
+bridgeMaterials: [43, 44, 125, 126]
+maximumBoosts: 2
+
 hoistingDelay: 40
 droppingDelay: 10
+
 portcullisMaterials: [85, 101, 113]
-allowFloating: true
+allowFloating: false
+
 powerBlocks: []
 additionalWallMaterials: []
-startSoundURL: http://mc.pepsoft.org/plugins/portecoulissante/sounds/portcullis_start.wav
-upSoundURL: http://mc.pepsoft.org/plugins/portecoulissante/sounds/portcullis_up.wav
-downSoundURL: http://mc.pepsoft.org/plugins/portecoulissante/sounds/portcullis_down.wav
-soundEffectDistance: 24
-soundEffectVolume: 50
+
+soundEffectDistance: 0
+soundEffectVolume: 0
+soundEffects: false

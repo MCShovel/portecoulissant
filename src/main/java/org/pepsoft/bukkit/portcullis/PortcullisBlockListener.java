@@ -32,6 +32,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import static org.bukkit.block.BlockFace.*;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.pepsoft.bukkit.PortcullisPlugin;
+
 import static org.pepsoft.minecraft.Constants.*;
 import static org.pepsoft.bukkit.portcullis.Directions.*;
 

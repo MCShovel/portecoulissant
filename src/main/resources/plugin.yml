@@ -15,4 +15,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 name: PorteCoulissante
 version: 1.4.3
-main: org.pepsoft.bukkit.portcullis.PortcullisPlugin
+main: org.pepsoft.bukkit.PortcullisPlugin

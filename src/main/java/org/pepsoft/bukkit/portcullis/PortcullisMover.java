@@ -31,7 +31,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.getspout.spoutapi.SpoutManager;
+import org.pepsoft.bukkit.PortcullisPlugin;
+
 import static org.pepsoft.minecraft.Constants.*;
 import static org.pepsoft.bukkit.portcullis.PortcullisMover.Status.*;
 import static org.pepsoft.bukkit.portcullis.Directions.*;
@@ -74,16 +75,6 @@ public class PortcullisMover implements Runnable {
         int hoistingDelay = plugin.getHoistingDelay();
         taskId = scheduler.scheduleSyncRepeatingTask(plugin, this, hoistingDelay / 2, hoistingDelay);
 
-        if (plugin.isSoundEffects() && (status != HOISTING)) {
-            World world = plugin.getServer().getWorld(portcullis.getWorldName());
-            if (world != null) {
-                SpoutManager.getSoundManager().playGlobalCustomSoundEffect(plugin, plugin.getStartSoundURL(), false, new Location(world, portcullis.getX() + portcullis.getDirection().getModX() * portcullis.getWidth() / 2, portcullis.getY(), portcullis.getZ() + portcullis.getDirection().getModZ() * portcullis.getWidth() / 2), plugin.getSoundEffectDistance(), plugin.getSoundEffectVolume());
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("[PorteCoulissante] Playing start sound effect");
-                }
-            }
-        }
-        
         status = HOISTING;
     }
 
@@ -102,16 +93,6 @@ public class PortcullisMover implements Runnable {
         }
         int droppingDelay = plugin.getDroppingDelay();
         taskId = scheduler.scheduleSyncRepeatingTask(plugin, this, droppingDelay, droppingDelay);
-
-        if (plugin.isSoundEffects() && (status != DROPPING)) {
-            World world = plugin.getServer().getWorld(portcullis.getWorldName());
-            if (world != null) {
-                SpoutManager.getSoundManager().playGlobalCustomSoundEffect(plugin, plugin.getStartSoundURL(), false, new Location(world, portcullis.getX() + portcullis.getDirection().getModX() * portcullis.getWidth() / 2, portcullis.getY(), portcullis.getZ() + portcullis.getDirection().getModZ() * portcullis.getWidth() / 2), plugin.getSoundEffectDistance(), plugin.getSoundEffectVolume());
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("[PorteCoulissante] Playing start sound effect");
-                }
-            }
-        }
         downSoundPlayedInPreviousMove = false;
         
         status = DROPPING;
@@ -251,13 +232,6 @@ public class PortcullisMover implements Runnable {
             moveEntitiesUp(world, chunkCoords, portcullis);
         }
 
-        if (plugin.isSoundEffects()) {
-            SpoutManager.getSoundManager().playGlobalCustomSoundEffect(plugin, plugin.getUpSoundURL(), false, new Location(world, x + dx * width / 2, y + 1, z + dz * width / 2), plugin.getSoundEffectDistance(), plugin.getSoundEffectVolume());
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("[PorteCoulissante] Playing up sound effect");
-            }
-        }
-        
         portcullis.setY(y + 1);
         return true;
     }
@@ -339,18 +313,6 @@ public class PortcullisMover implements Runnable {
         }
 
         portcullis.setY(y);
-
-        if (plugin.isSoundEffects()) {
-            if (! downSoundPlayedInPreviousMove) {
-                SpoutManager.getSoundManager().playGlobalCustomSoundEffect(plugin, plugin.getDownSoundURL(), false, new Location(world, x + dx * width / 2, y - 1, z + dz * width / 2), plugin.getSoundEffectDistance(), plugin.getSoundEffectVolume());
-                downSoundPlayedInPreviousMove = true;
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("[PorteCoulissante] Playing down sound effect");
-                }
-            } else {
-                downSoundPlayedInPreviousMove = false;
-            }
-        }
 
         return true;
     }
