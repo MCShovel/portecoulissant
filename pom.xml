@@ -41,7 +41,7 @@
             <artifactId>craftbukkit</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>/opt/msm/src/spigot/craftbukkit.jar</systemPath>
+            <systemPath>${basedir}/../spigot/craftbukkit.jar</systemPath>
         </dependency>
     </dependencies>
 
